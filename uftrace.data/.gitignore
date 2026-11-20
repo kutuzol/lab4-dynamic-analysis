@@ -1,7 +1,0 @@
-example1
-example1_fixed
-ltrace_test
-uftrace_demo
-*.o
-uftrace.data
-valgrind_output.txt

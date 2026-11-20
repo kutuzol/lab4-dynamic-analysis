@@ -1,4 +1,4 @@
-name: Valgrind Analysis
+name: Robot Courier Valgrind CI
 
 on: [push]
 
@@ -16,17 +16,23 @@ jobs:
           apt-get update -qq
           apt-get install -y valgrind build-essential gdb > /dev/null 2>&1
 
-      - name: Run Valgrind on original code
+      - name: Run Valgrind on vulnerable code
         run: |
           echo "=== Запуск Valgrind анализа (с ошибками) ==="
-          gcc -g -O0 example1.c -o example1
-          printf 'XAAAAAAAAAAA' | valgrind --leak-check=full --error-exitcode=1 ./example1 > valgrind_output.txt 2>&1 || true
+          gcc -g -O0 robot_courier_vulnerable.c -o robot_courier_vulnerable
+          # Передаем длинный OTA-пакет, чтобы спровоцировать heap overflow
+          valgrind --leak-check=full --track-origins=yes --error-exitcode=1 \
+            ./robot_courier_vulnerable "FIRMWARE_UPDATE_v1.2.3_CRITICAL_PATCH_FOR_TMR_SYSTEM" \
+            > valgrind_output.txt 2>&1 || true
 
       - name: Run Valgrind on fixed code
         run: |
           echo "=== Проверка исправленного кода ==="
-          gcc -g -O0 example1_fixed.c -o example1_fixed
-          printf 'XAAAAAAAAAAA' | valgrind --leak-check=full ./example1_fixed || true
+          gcc -g -O0 robot_courier_fixed.c -o robot_courier_fixed
+          # Передаем ту же строку. Исправленный код должен отработать без ошибок.
+          valgrind --leak-check=full --track-origins=yes \
+            ./robot_courier_fixed "FIRMWARE_UPDATE_v1.2.3_CRITICAL_PATCH_FOR_TMR_SYSTEM" \
+            || true
           echo "✅ Исправленный код проходит Valgrind"
 
       - name: Upload Valgrind logs
@@ -35,3 +41,4 @@ jobs:
         with:
           name: valgrind-report
           path: valgrind_output.txt
+          retention-days: 7
