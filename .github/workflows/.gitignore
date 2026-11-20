@@ -1,0 +1,48 @@
+# Скомпилированные бинарники
+robot_courier_vulnerable
+robot_courier_fixed
+robot_fixed
+robot_fixed_pg
+*.exe
+*.out
+
+# Объектные файлы и библиотеки
+*.o
+*.a
+*.so
+*.dylib
+
+# Файлы Valgrind
+valgrind_output.txt
+vgcore.*
+core
+core.*
+
+# Файлы uftrace
+uftrace.data
+uftrace.data.*
+
+# Файлы ltrace
+ltrace.log
+
+# Временные файлы и кэш
+*.tmp
+*.log
+*.swp
+*~
+
+# Папки с результатами фаззинга AFL++
+output_dir/
+input_dir/
+crash.dict
+minimized_crash
+
+# Файлы IDE и редакторов
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Системные файлы
+.DS_Store
+Thumbs.db
