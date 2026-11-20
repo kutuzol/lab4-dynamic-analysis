@@ -1,0 +1,31 @@
+stages:
+ - analyze
+variables:
+ DOCKER_IMAGE: ubuntu:24.04
+before_script:
+ - apt-get update -qq
+ - apt-get install -y --no-install-recommends valgrind
+build-essential gdb > /dev/null 2>&1
+valgrind_test:
+ stage: analyze
+ image: ${DOCKER_IMAGE}
+ script:
+- echo "=== Запуск Valgrind анализа ==="
+- gcc -g -O0 example1.c -o example1
+- valgrind --leak-check=full --error-exitcode=1
+./example1
+- echo " Valgrind анализ пройден успешно" ✅
+ artifacts:
+when: always
+paths:
+ - valgrind_output.txt
+expire_in: 1 week
+valgrind_test_fixed:
+ stage: analyze
+ image: ${DOCKER_IMAGE}
+ script:
+- echo "=== Проверка исправленного кода ==="
+- gcc -g -O0 example1_fixed.c -o example1_fixed
+- valgrind --leak-check=full --error-exitcode=1
+./example1_fixed
+- echo " Исправленный код проходит Valgrind"
